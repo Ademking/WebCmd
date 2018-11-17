@@ -1,0 +1,113 @@
+@font-face {
+    font-family: 'FixedsysExcelsior';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../font/fsex300-webfont.eot');
+    src: url('../font/fsex300-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../font/fsex300-webfont.woff') format('woff'),
+        url('../font/fsex300-webfont.ttf') format('truetype'),
+        url('../font/fsex300-webfont.svg#FixedsysExcelsior301Regular') format('svg');
+    -webkit-font-smoothing: aliased;
+    font-smooth: never;
+}
+
+/*loading*/
+#loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#loading h1 {
+    font-size: 3em;
+}
+
+/*Scroll bar start*/
+body::-webkit-scrollbar {
+    width: 0.8em;
+}
+
+body::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+}
+
+/*Scroll bar end*/
+html {
+    padding: 10px; 
+}
+
+/*Autocomplete white background fix*/
+.ui-widget-content {
+    background-color: #000000 !important;
+}
+
+/* Sweetalert modification start*/
+.swal2-popup {
+    background: #3a3a3a !important;
+}
+
+.swal2-popup .swal2-title {
+    color: #fff !important;
+}
+
+.swal2-popup .swal2-styled.swal2-confirm {
+    background-color: #00FF00;
+}
+
+/* Sweetalert modification end*/
+span {
+    white-space: pre;
+}
+
+.float1 {
+    position: fixed;
+    width: 100px;
+    height: 60px;
+    bottom: 40px;
+    right: 40px;
+    border-radius: 50px;
+    text-align: center;
+
+}
+
+.float2 {
+    position: fixed;
+    width: 100px;
+    height: 60px;
+    bottom: 100px;
+    right: 40px;
+    border-radius: 50px;
+    text-align: center;
+
+}
+
+html {
+    background-color: #000000;
+}
+
+* {
+    font-family: 'FixedsysExcelsior';
+    font-weight: normal;
+    color: #00FF00;
+    font-size: 1.1em;
+}
+
+.line {
+    display: flex;
+}
+
+input,
+textarea {
+    resize: none;
+    overflow: hidden;
+    background-color: #000000;
+    border: none;
+    outline: none;
+    width: 100%;
+}
