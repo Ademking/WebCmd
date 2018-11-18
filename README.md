@@ -35,6 +35,7 @@ you open a new tab.
 
 ### To Do
 
+* Add Custom Fast Shortcut
 * Add alarm (using LocalStorage)
 * Add chatroom
 * Add news
