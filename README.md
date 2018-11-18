@@ -1,5 +1,9 @@
 ## WebCmd : Improved "new tab" page made for CLI Lovers
 
+<p align="center"><a href="https://github.com/Ademking/WebCmd" target="_blank">
+    <img src="https://i.imgur.com/GKhxaq2.png">
+</a></p>
+
 Are you a big fan of the command line interface ?
 You hate using computer mouse ?
 
