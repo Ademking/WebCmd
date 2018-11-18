@@ -1,10 +1,13 @@
-﻿let TEXTCOLOR = "#00FF00"; // Default text color
+/* By Adem KOUKI */
+/* GitHub : https://github.com/Ademking/WebCmd */
+
+let TEXTCOLOR = "#00FF00"; // Default text color
 let BGCOLOR = "#000000"; // Default Background Color
 let USERNAME = "User";
 let MYIP = "";
 let NOTES = [];
-// Help Text
 
+// Help Text
 let helptext = "Help" + "\n";
 helptext = "----------" + "\n";
 helptext += "cls | clear\t\t\t\tClear the screen" + "\n";
@@ -1272,7 +1275,7 @@ For more information, visit http://nerdamer.com/documentation.html
      * @return {String} Returns day as string
      */
     function dayOfWeekAsString(dayIndex) {
-        return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][dayIndex - 1];
+        return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayIndex];
     }
 
     // Sleep function
