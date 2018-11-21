@@ -1,6 +1,6 @@
 # 💣 WebCmd
 
-### Improved "new tab" page made for CLI Lovers
+### (Version 1.1) Improved "new tab" page made for CLI Lovers
 
 <p align="center"><a href="https://github.com/Ademking/WebCmd" target="_blank">
     <img src="https://i.imgur.com/GKhxaq2.png">
