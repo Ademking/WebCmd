@@ -6,6 +6,43 @@ let BGCOLOR = "#000000"; // Default Background Color
 let USERNAME = "User";
 let MYIP = "";
 let NOTES = [];
+let CUSTOM_CMDS = [];
+let AVAILABLE_TAGS = [
+    "facebook",
+    "google ",
+    "wiki ",
+    "stackoverflow ",
+    "translate ",
+    "ip",
+    "quote",
+    "joke",
+    "calc ",
+    "restart",
+    "set user ",
+    "linkedin",
+    "github",
+    "twitter",
+    "outlook",
+    "soundcloud",
+    "hotmail",
+    "gmail",
+    "reddit",
+    "youtube",
+    "bing",
+    "music lofi",
+    "music jazz",
+    "music rock",
+    "weather",
+    "notes",
+    "settings",
+    "history",
+    "bookmarks",
+    "extensions",
+    "cmd add",
+    "cmd list",
+    "cmd remove ",
+    "cmd clear"
+];
 
 // Help Text
 let helptext = "Help" + "\n";
@@ -34,7 +71,7 @@ helptext += "quote\t\t\t\t\tRandom Quote about programming" + "\n";
 helptext += "joke\t\t\t\t\tRandom Joke about programming" + "\n";
 helptext += "translate {lang1} {lang2} {phrase}\tTranslate phrase using Google Translate" + "\n";
 helptext += "\t\t\t\t\t┗ Example: \"translate en fr dog\"" + "\n";
-helptext += "music {type}\t\t\t\t\tPlay Music [Types : lofi , jazz , rock]" + "\n";
+helptext += "music {type}\t\t\t\tPlay Music [Types : lofi , jazz , rock]" + "\n";
 helptext += "weather {location}\t\t\tWeather in your location" + "\n";
 helptext += "settings\t\t\t\tOpen your browser settings" + "\n";
 helptext += "history\t\t\t\t\tOpen your browser history" + "\n";
@@ -42,8 +79,9 @@ helptext += "bookmarks\t\t\t\tOpen your browser bookmarks" + "\n";
 helptext += "extensions\t\t\t\tOpen your browser extensions" + "\n";
 helptext += "reset\t\t\t\t\tReset WebCmd (Remove saved parameters)" + "\n";
 helptext += "notes\t\t\t\t\tCreate / Remove Notes ... for more help type \"notes -h\" " + "\n";
-
-
+helptext += "cmd add\t\t\t\t\tCreate Custom commands to open websites " + "\n";
+helptext += "cmd list\t\t\t\tShow list of custom commands " + "\n";
+helptext += "cmd remove {index}\t\t\tRemove custom commands by index" + "\n";
 
 // Programming quotes (45 quotes)
 let programming_quotes = [{
@@ -666,6 +704,7 @@ $(document).ready(function () {
     welcomeMsg();
     create_new_empty_line();
 
+    custom_cmds_init();
 
 
 });
@@ -728,14 +767,13 @@ function validator() {
         })
         create_result_line("Opening Extensions...");
         create_new_empty_line();
-    }
-    else if (last_cmd.toLowerCase() == 'dino') {
+    } else if (last_cmd.toLowerCase() == 'dino') {
         chrome.tabs.update({
             url: 'chrome://dino/'
         })
         create_result_line("Opening Dino Game...");
         create_new_empty_line();
-    }  else if (last_cmd.toLowerCase() == 'bookmarks') {
+    } else if (last_cmd.toLowerCase() == 'bookmarks') {
         chrome.tabs.create({
             url: 'chrome://bookmarks/'
         })
@@ -955,554 +993,702 @@ For more information, visit http://nerdamer.com/documentation.html
     } else if (last_cmd.toLowerCase() == "ip") {
         myIP();
     } else if (last_cmd.toLowerCase().includes("music ")) {
-            let genre = last_cmd.replace("music ", "");
-            if (genre == "jazz") {
+        let genre = last_cmd.replace("music ", "");
+        if (genre == "jazz") {
 
-                create_result_line("Playing Jazz Music ...");
-                create_result_line("");
-                music("jazz");
-                create_result_line("");
-                create_new_empty_line();
-
-            } else if (genre == "lofi") {
-               
-                create_result_line("Playing Lofi Music ...");
-                create_result_line("");
-                music("lofi");
-                create_result_line("");
-                create_new_empty_line();
-               
-            } else if (genre == "rock") {
-                create_result_line("Playing Rock Music ...");
-                create_result_line("");
-                music("rock");
-                create_result_line("");
-                create_new_empty_line();
-            }
-
-        } else if (last_cmd.toLowerCase() == "quote") {
-            let quote = getQuote();
-            create_result_multiline(quote);
+            create_result_line("Playing Jazz Music ...");
+            create_result_line("");
+            music("jazz");
+            create_result_line("");
             create_new_empty_line();
-        } else if (last_cmd.toLowerCase() == "joke") {
-            let joke = getJoke();
-            create_result_multiline(joke);
+
+        } else if (genre == "lofi") {
+
+            create_result_line("Playing Lofi Music ...");
+            create_result_line("");
+            music("lofi");
+            create_result_line("");
             create_new_empty_line();
-        } else if (last_cmd.toLowerCase().includes("translate ")) {
-            
-            let words = last_cmd.replace("translate ", "").split(" ");
-            if (words.length >= 3) {
-                let arg0 = words[0];
-                let arg1 = words[1];
-                let phrase = words.slice(2, words.length).join(" "); //get the phrase after remove arguments
-                sleep(500).then(() => {
-                    create_result_line(`Translating ${phrase}...`);
-                    //https://translate.google.com/#fr/ar/chien
-                    window.open(`https://translate.google.com/#${arg0}/${arg1}/${phrase}`, "_blank");
-                    create_new_empty_line();
-                })
 
-
-
-            } else {
-                // missing argument ..
-                create_result_line(`Error! you're missing an argument! Please check HELP for more information`);
-                create_new_empty_line();
-            }
-
-
-        } else {
-            try {
-                if (last_cmd == "" || last_cmd == null || last_cmd == undefined) {
-                    create_new_empty_line();
-                    return;
-                }
-                let l = eval(last_cmd);
-                create_result_line(l);
-                create_new_empty_line();
-            } catch (e) {
-                //create_result_line(e);
-                create_new_error_line();
-                create_new_empty_line();
-            }
-
-        }
-    }
-
-    function init_colors() {
-
-        if (localStorage.getItem("textcolor") === null) {
-            localStorage.setItem("textcolor", TEXTCOLOR)
+        } else if (genre == "rock") {
+            create_result_line("Playing Rock Music ...");
+            create_result_line("");
+            music("rock");
+            create_result_line("");
+            create_new_empty_line();
         }
 
-        if (localStorage.getItem("bgcolor") === null) {
-            localStorage.setItem("bgcolor", BGCOLOR)
-        }
-
-
-        if (localStorage.getItem("textcolor") != TEXTCOLOR) {
-            let newTEXTCOLOR = localStorage.getItem("textcolor");
-            $("*").css("color", newTEXTCOLOR);
-            TEXTCOLOR = newTEXTCOLOR;
-            document.getElementById("textselect").value = TEXTCOLOR;
-
-        }
-        if (localStorage.getItem("bgcolor") != BGCOLOR) {
-            let newBGCOLOR = localStorage.getItem("bgcolor");
-            $("*").css("background-color", newBGCOLOR);
-            BGCOLOR = newBGCOLOR;
-            document.getElementById("bgselect").value = BGCOLOR;
-
-        }
-    }
-
-    function init_autocompleteUI() {
-        var availableTags = [
-            "facebook",
-            "google ",
-            "wiki ",
-            "stackoverflow ",
-            "translate ",
-            "ip",
-            "quote",
-            "joke",
-            "calc ",
-            "restart",
-            "set user ",
-            "linkedin",
-            "github",
-            "twitter",
-            "outlook",
-            "soundcloud",
-            "hotmail",
-            "gmail",
-            "reddit",
-            "youtube",
-            "bing",
-            "music lofi",
-            "music jazz",
-            "music rock",
-            "weather",
-            "notes",
-            "settings",
-            "history",
-            "bookmarks",
-            "extensions",
-        ];
-        $("input").autocomplete({
-            open: function () {
-                $(".ui-menu-item-wrapper").css('color', TEXTCOLOR);
-                $(".ui-menu-item-wrapper").css('background-color', adjustBrightness(BGCOLOR, 50));
-                $('.ui-autocomplete').css('width', '300px'); // width HERE
-            },
-            source: function (request, response) {
-                var matches = $.map(availableTags, function (acItem) {
-                    if (acItem.toUpperCase().indexOf(request.term.toUpperCase()) === 0) {
-                        return acItem;
-                    }
-                });
-                response(matches);
-            },
-            autoFocus: true,
-            minLength: 1,
-            delay: 100,
-            select: function (event, ui) {
-
-                this.value = ui.item.value;
-
-                if (event.keyCode == 9) {
-                    event.preventDefault();
-                    this.value = this.value;
-                    $("input").last().focus();
-                }
-
-                return false;
-            }
-        });
-    }
-
-
-    // Adjust Brightness of HEX color
-    // from: https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
-    function adjustBrightness(col, amt) {
-
-        var usePound = false;
-
-        if (col[0] == "#") {
-            col = col.slice(1);
-            usePound = true;
-        }
-
-        var R = parseInt(col.substring(0, 2), 16);
-        var G = parseInt(col.substring(2, 4), 16);
-        var B = parseInt(col.substring(4, 6), 16);
-
-        // to make the colour less bright than the input
-        // change the following three "+" symbols to "-"
-        R = R + amt;
-        G = G + amt;
-        B = B + amt;
-
-        if (R > 255) R = 255;
-        else if (R < 0) R = 0;
-
-        if (G > 255) G = 255;
-        else if (G < 0) G = 0;
-
-        if (B > 255) B = 255;
-        else if (B < 0) B = 0;
-
-        var RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
-        var GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
-        var BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
-
-        return (usePound ? "#" : "") + RR + GG + BB;
-
-
-    }
-
-
-
-
-    /**
-     * Clear the screen
-     */
-    function cls() {
-        $(".console").html('');
-        //$("header").html('');
+    } else if (last_cmd.toLowerCase() == "quote") {
+        let quote = getQuote();
+        create_result_multiline(quote);
         create_new_empty_line();
-    }
+    } else if (last_cmd.toLowerCase() == "joke") {
+        let joke = getJoke();
+        create_result_multiline(joke);
+        create_new_empty_line();
+    } else if (last_cmd.toLowerCase() == "cmd add") {
+        custom_cmd_add_ui();
+        create_new_empty_line();
+    } else if (last_cmd.toLowerCase() == 'cmd clear') {
+        removeAllCMD();
+        create_result_line("All Custom Commands removed successfully !");
+        create_new_empty_line();
+    } else if (last_cmd.toLowerCase().includes('cmd remove ')) {
 
-    /**
-     * Create empty line message
-     */
-    function create_new_empty_line() {
-        $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
-        $(".console").append(`<div class="line"><span style="color: ${TEXTCOLOR}" class="path">WebCmd:~ ${USERNAME}$ </span><input style="color: ${TEXTCOLOR}; background-color: ${BGCOLOR}" class="cmdinput" value=""/></div>`)
-        $("input").last().focus();
-    }
+        let i = last_cmd.replace("cmd remove ", "");
+        removeCMDByIndex(i);
+        create_result_line("Custom Command " + i + "# removed successfully");
+        create_new_empty_line();
 
-    function create_new_audio_line(url) {
-        $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
-        $(".console").append(`<div class="line"><audio autoplay controls src="${url}"> Your browser does not support the <code>audio</code> element.</audio></div>`)
-        $("input").last().focus();
-    }
+    } else if (last_cmd.toLowerCase() == "cmd list") {
 
-    /**
-     * Create single line message
-     */
-    function create_result_line(text) {
-        $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
-        $(".console").append(`<div class="line"><input style="color: ${TEXTCOLOR}; background-color: ${BGCOLOR}" class="cmdinput" value="${text}"/></div>`)
-        $("input").last().focus();
-    }
+        show_list_custom_cmd();
+        create_new_empty_line();
 
 
-    /**
-     * Create multiLine message
-     */
-    function create_result_multiline(text) {
-        let nb_lines = text.split(/\r\n|\r|\n/).length;
-        if (nb_lines == 1 || nb_lines == 0) nb_lines = 3;
-        $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
-        $(".console").append(`<div class="line"><textarea style="color: ${TEXTCOLOR}; background-color: ${BGCOLOR}" rows="${nb_lines}" class="cmdinput">${text}</textarea></div>`)
-        $("input").last().focus();
-    }
+    } else if (last_cmd.toLowerCase().includes("translate ")) {
 
-
-    /**
-     * Create a new error message
-     */
-    function create_new_error_line() {
-        let last_cmd = $("input:last").val();
-        $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
-        $(".console").append(`<div class="line"><span style="color: ${TEXTCOLOR}" class="path">C:\\Users\\${USERNAME}></span><input style="color: ${TEXTCOLOR}; background-color: ${BGCOLOR}" class="cmdinput" value="'${last_cmd}' is not recognized as an internal command. Type 'help' for help "/></div>`)
-        $("input").last().focus();
-    }
-
-
-    // onchange - text color
-    function textcolor(t) {
-        TEXTCOLOR = t.value;
-        $("*").css("color", TEXTCOLOR);
-    }
-    // onchange - background color
-    function bgcolor(t) {
-        BGCOLOR = t.value;
-        $("*").css("background-color", BGCOLOR);
-    }
-
-    // add "0" if number < 10
-    function checkTime(i) {
-        if (i < 10) {
-            i = "0" + i;
-        }
-        return i;
-    }
-
-    // Show Time
-    function startTime() {
-        var today = new Date();
-        var h = today.getHours();
-        var m = today.getMinutes();
-        var s = today.getSeconds();
-
-
-        var y = today.getFullYear();
-        var mo = today.getMonth();
-        var d = today.getDay();
-        var d_s = dayOfWeekAsString(d);
-        // add a zero in front of numbers<10
-        y = checkTime(y);
-        mo = checkTime(mo);
-        d = checkTime(d);
-        // add a zero in front of numbers<10
-        m = checkTime(m);
-        s = checkTime(s);
-        document.getElementById('time').innerHTML = `It's now ${h}:${m}:${s} ⏲️ ${d_s} ${d}/${mo}/${y}`;
-        t = setTimeout(function () {
-            startTime()
-        }, 500);
-    }
-
-
-
-
-    /**
-     * Converts a day number to a string.
-     *
-     * @param {Number} dayIndex
-     * @return {String} Returns day as string
-     */
-    function dayOfWeekAsString(dayIndex) {
-        return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayIndex];
-    }
-
-    // Sleep function
-    function sleep(time) {
-        return new Promise((resolve) => setTimeout(resolve, time));
-    }
-
-    /**
-     * Return random quote
-     */
-    function getQuote() {
-        let rand_between_1_44 = Math.floor(Math.random() * 44) + 1;
-        return programming_quotes[rand_between_1_44]["quote"];
-    }
-    /**
-     * Return random joke
-     */
-    function getJoke() {
-        let rand_between_1_62 = Math.floor(Math.random() * 62) + 1;
-        return "\n-------------\n" + jokes[rand_between_1_62]["setup"] + "\n" + jokes[rand_between_1_62]["punchline"] + "\n-------------";
-    }
-
-    function welcomeMsg() {
-        var today = new Date()
-        var curHr = today.getHours()
-        if (curHr < 12) {
-            document.getElementById('welcome').innerHTML = `☀️ Good morning ${USERNAME}.`;
-        } else if (curHr < 18) {
-            document.getElementById('welcome').innerHTML = `🌤️ Good afternoon ${USERNAME}.`;
-        } else {
-            document.getElementById('welcome').innerHTML = `🌙 Good evening ${USERNAME}.`;
-        }
-    }
-
-    async function getUsername() {
-        let user = localStorage.getItem('username');
-        if (user == null) {
-
-
-            const {
-                value: u
-            } = await swal({
-                title: 'Thanks for using WebCmd!\nPlease enter your name',
-                input: 'text',
-                inputPlaceholder: 'Your Name',
-                inputValidator: (value) => {
-                    return !value && 'You need to write something!'
-                }
+        let words = last_cmd.replace("translate ", "").split(" ");
+        if (words.length >= 3) {
+            let arg0 = words[0];
+            let arg1 = words[1];
+            let phrase = words.slice(2, words.length).join(" "); //get the phrase after remove arguments
+            sleep(500).then(() => {
+                create_result_line(`Translating ${phrase}...`);
+                //https://translate.google.com/#fr/ar/chien
+                window.open(`https://translate.google.com/#${arg0}/${arg1}/${phrase}`, "_blank");
+                create_new_empty_line();
             })
 
-            USERNAME = u;
-            localStorage.setItem("username", capitalizeFirstLetter(u));
-            location.reload();
+
+
         } else {
-            USERNAME = user;
+            // missing argument ..
+            create_result_line(`Error! you're missing an argument! Please check HELP for more information`);
+            create_new_empty_line();
+        }
+
+
+    } else if (isCustomCmd(last_cmd)) {
+        let url = getURLbyCmd(last_cmd);
+        window.open(url, '_blank');
+    } else {
+
+        try {
+            if (last_cmd == "" || last_cmd == null || last_cmd == undefined) {
+                create_new_empty_line();
+                return;
+            }
+            let l = eval(last_cmd);
+            create_result_line(l);
+            create_new_empty_line();
+        } catch (e) {
+            //create_result_line(e);
+            create_new_error_line();
+            create_new_empty_line();
         }
 
     }
+}
 
+function init_colors() {
 
-    /**
-     * Capitalize first letter 
-     * Example : adem ==> Adem
-     */
-    function capitalizeFirstLetter(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
+    if (localStorage.getItem("textcolor") === null) {
+        localStorage.setItem("textcolor", TEXTCOLOR)
     }
 
-    /**
-     * return IP
-     */
-    function myIP() {
-        const ipAPI = 'https://api.ipify.org?format=json';
-        const inputValue = fetch(ipAPI)
-            .then(response => response.json())
-            .then(data => {
-                create_result_line("Your IP : " + data.ip);
-                create_new_empty_line();
-            }).catch(() => {
-                create_result_line("Oops! Please check your internet connection...");
-                create_new_empty_line();
+    if (localStorage.getItem("bgcolor") === null) {
+        localStorage.setItem("bgcolor", BGCOLOR)
+    }
+
+
+    if (localStorage.getItem("textcolor") != TEXTCOLOR) {
+        let newTEXTCOLOR = localStorage.getItem("textcolor");
+        $("*").css("color", newTEXTCOLOR);
+        TEXTCOLOR = newTEXTCOLOR;
+        document.getElementById("textselect").value = TEXTCOLOR;
+
+    }
+    if (localStorage.getItem("bgcolor") != BGCOLOR) {
+        let newBGCOLOR = localStorage.getItem("bgcolor");
+        $("*").css("background-color", newBGCOLOR);
+        BGCOLOR = newBGCOLOR;
+        document.getElementById("bgselect").value = BGCOLOR;
+
+    }
+}
+
+function init_autocompleteUI() {
+    var availableTags = AVAILABLE_TAGS.concat(getCustomCmdArray());
+
+    $("input").autocomplete({
+        open: function () {
+            $(".ui-menu-item-wrapper").css('color', TEXTCOLOR);
+            $(".ui-menu-item-wrapper").css('background-color', adjustBrightness(BGCOLOR, 50));
+            $('.ui-autocomplete').css('width', '300px'); // width HERE
+        },
+        source: function (request, response) {
+            var matches = $.map(availableTags, function (acItem) {
+                if (acItem.toUpperCase().indexOf(request.term.toUpperCase()) === 0) {
+                    return acItem;
+                }
             });
+            response(matches);
+        },
+        autoFocus: true,
+        minLength: 1,
+        delay: 100,
+        select: function (event, ui) {
 
-    }
+            this.value = ui.item.value;
 
-    // onclick Help button
-    // (onclick doesn't work on chrome extension... so i must use this shit)
-    document.addEventListener('DOMContentLoaded', function () {
-        var link = document.getElementById('help');
-        link.addEventListener('click', function () {
-            helpBtn();
-        });
-    });
+            if (event.keyCode == 9) {
+                event.preventDefault();
+                this.value = this.value;
+                $("input").last().focus();
+            }
 
-    // onchange Text color 
-    // (onclick doesn't work on chrome extension... so i must use this shit)
-    document.addEventListener('DOMContentLoaded', function () {
-        var link = document.getElementById('textselect');
-        link.addEventListener('change', function () {
-            localStorage.setItem('textcolor', link.value);
-            textcolor(link);
-        });
-    });
-
-    // onchange Text color 
-    // (onclick doesn't work on chrome extension... so i must use this shit)
-    document.addEventListener('DOMContentLoaded', function () {
-        var link = document.getElementById('bgselect');
-        link.addEventListener('change', function () {
-            localStorage.setItem('bgcolor', link.value);
-            bgcolor(link);
-        });
-    });
-
-
-
-
-    /**
-     * Show Help when btn clicked
-     */
-    function helpBtn() {
-        $("html, body").animate({
-            scrollTop: $(document).height()
-        }, "slow");
-        create_result_multiline(helptext);
-        create_new_empty_line();
-    }
-
-    /**
-     * Reset Everything
-     */
-    function reset() {
-        localStorage.clear();
-        location.reload();
-    }
-
-
-
-
-    function showAllNotes() {
-        let storedData = localStorage.getItem("notes");
-        if (storedData) {
-            arr_notes = JSON.parse(storedData);
-            res = "";
-            arr_notes.forEach((element, i) => {
-                res += i + 1 + ") " + element + "\n";
-            });
-            create_result_multiline(res);
-        } else {
-            create_result_line("No Notes Found... You can add notes by typing 'notes add { your note }'")
+            return false;
         }
+    });
+}
+
+
+// Adjust Brightness of HEX color
+// from: https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+function adjustBrightness(col, amt) {
+
+    var usePound = false;
+
+    if (col[0] == "#") {
+        col = col.slice(1);
+        usePound = true;
     }
-    /**
-     * create a new note
-     * @param {string} text 
-     */
-    async function storeNote() {
+
+    var R = parseInt(col.substring(0, 2), 16);
+    var G = parseInt(col.substring(2, 4), 16);
+    var B = parseInt(col.substring(4, 6), 16);
+
+    // to make the colour less bright than the input
+    // change the following three "+" symbols to "-"
+    R = R + amt;
+    G = G + amt;
+    B = B + amt;
+
+    if (R > 255) R = 255;
+    else if (R < 0) R = 0;
+
+    if (G > 255) G = 255;
+    else if (G < 0) G = 0;
+
+    if (B > 255) B = 255;
+    else if (B < 0) B = 0;
+
+    var RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
+    var GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
+    var BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
+
+    return (usePound ? "#" : "") + RR + GG + BB;
+
+
+}
+
+
+
+
+/**
+ * Clear the screen
+ */
+function cls() {
+    $(".console").html('');
+    //$("header").html('');
+    create_new_empty_line();
+}
+
+/**
+ * Create empty line message
+ */
+function create_new_empty_line() {
+    $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
+    $(".console").append(`<div class="line"><span style="color: ${TEXTCOLOR}" class="path">WebCmd:~ ${USERNAME}$ </span><input style="color: ${TEXTCOLOR}; background-color: ${BGCOLOR}" class="cmdinput" value=""/></div>`)
+    $("input").last().focus();
+}
+
+function create_new_audio_line(url) {
+    $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
+    $(".console").append(`<div class="line"><audio autoplay controls src="${url}"> Your browser does not support the <code>audio</code> element.</audio></div>`)
+    $("input").last().focus();
+}
+
+/**
+ * Create single line message
+ */
+function create_result_line(text) {
+    $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
+    $(".console").append(`<div class="line"><input style="color: ${TEXTCOLOR}; background-color: ${BGCOLOR}" class="cmdinput" value="${text}"/></div>`)
+    $("input").last().focus();
+}
+
+
+/**
+ * Create multiLine message
+ */
+function create_result_multiline(text) {
+    let nb_lines = text.split(/\r\n|\r|\n/).length;
+    if (nb_lines == 1 || nb_lines == 0) nb_lines = 3;
+    $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
+    $(".console").append(`<div class="line"><textarea style="color: ${TEXTCOLOR}; background-color: ${BGCOLOR}" rows="${nb_lines}" class="cmdinput">${text}</textarea></div>`)
+    $("input").last().focus();
+}
+
+
+/**
+ * Create a new error message
+ */
+function create_new_error_line() {
+    let last_cmd = $("input:last").val();
+    $("input .cmdinput").attr('disabled', 'disabled'); //disable old inputs
+    $(".console").append(`<div class="line"><span style="color: ${TEXTCOLOR}" class="path">C:\\Users\\${USERNAME}></span><input style="color: ${TEXTCOLOR}; background-color: ${BGCOLOR}" class="cmdinput" value="'${last_cmd}' is not recognized as an internal command. Type 'help' for help "/></div>`)
+    $("input").last().focus();
+}
+
+
+// onchange - text color
+function textcolor(t) {
+    TEXTCOLOR = t.value;
+    $("*").css("color", TEXTCOLOR);
+}
+// onchange - background color
+function bgcolor(t) {
+    BGCOLOR = t.value;
+    $("*").css("background-color", BGCOLOR);
+}
+
+// add "0" if number < 10
+function checkTime(i) {
+    if (i < 10) {
+        i = "0" + i;
+    }
+    return i;
+}
+
+// Show Time
+function startTime() {
+    var today = new Date();
+    var h = today.getHours();
+    var m = today.getMinutes();
+    var s = today.getSeconds();
+
+
+    var y = today.getFullYear();
+    var mo = today.getMonth();
+    var d = today.getDay();
+    var d_s = dayOfWeekAsString(d);
+    // add a zero in front of numbers<10
+    y = checkTime(y);
+    mo = checkTime(mo);
+    d = checkTime(d);
+    // add a zero in front of numbers<10
+    m = checkTime(m);
+    s = checkTime(s);
+    document.getElementById('time').innerHTML = `It's now ${h}:${m}:${s} ⏲️ ${d_s} ${d}/${mo}/${y}`;
+    t = setTimeout(function () {
+        startTime()
+    }, 500);
+}
+
+
+
+
+/**
+ * Converts a day number to a string.
+ *
+ * @param {Number} dayIndex
+ * @return {String} Returns day as string
+ */
+function dayOfWeekAsString(dayIndex) {
+    return ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][dayIndex];
+}
+
+// Sleep function
+function sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+/**
+ * Return random quote
+ */
+function getQuote() {
+    let rand_between_1_44 = Math.floor(Math.random() * 44) + 1;
+    return programming_quotes[rand_between_1_44]["quote"];
+}
+/**
+ * Return random joke
+ */
+function getJoke() {
+    let rand_between_1_62 = Math.floor(Math.random() * 62) + 1;
+    return "\n-------------\n" + jokes[rand_between_1_62]["setup"] + "\n" + jokes[rand_between_1_62]["punchline"] + "\n-------------";
+}
+
+function welcomeMsg() {
+    var today = new Date()
+    var curHr = today.getHours()
+    if (curHr < 12) {
+        document.getElementById('welcome').innerHTML = `☀️ Good morning ${USERNAME}.`;
+    } else if (curHr < 18) {
+        document.getElementById('welcome').innerHTML = `🌤️ Good afternoon ${USERNAME}.`;
+    } else {
+        document.getElementById('welcome').innerHTML = `🌙 Good evening ${USERNAME}.`;
+    }
+}
+
+async function getUsername() {
+    let user = localStorage.getItem('username');
+    if (user == null) {
+
 
         const {
-            value: n
+            value: u
         } = await swal({
-            title: 'Write your note here',
+            title: 'Thanks for using WebCmd!\nPlease enter your name',
             input: 'text',
-            inputPlaceholder: 'Your Note',
+            inputPlaceholder: 'Your Name',
             inputValidator: (value) => {
                 return !value && 'You need to write something!'
             }
+        })
+
+        USERNAME = u;
+        localStorage.setItem("username", capitalizeFirstLetter(u));
+        location.reload();
+    } else {
+        USERNAME = user;
+    }
+
+}
+
+
+/**
+ * Capitalize first letter 
+ * Example : adem ==> Adem
+ */
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+/**
+ * return IP
+ */
+function myIP() {
+    const ipAPI = 'https://api.ipify.org?format=json';
+    const inputValue = fetch(ipAPI)
+        .then(response => response.json())
+        .then(data => {
+            create_result_line("Your IP : " + data.ip);
+            create_new_empty_line();
+        }).catch(() => {
+            create_result_line("Oops! Please check your internet connection...");
+            create_new_empty_line();
         });
-        if (n) {
-            swal(`Done!`, `Note Added Successfully!`, `success`).then(() => {
-                location.reload();
-            });
 
+}
+
+// onclick Help button
+// (onclick doesn't work on chrome extension... so i must use this shit)
+document.addEventListener('DOMContentLoaded', function () {
+    var link = document.getElementById('help');
+    link.addEventListener('click', function () {
+        helpBtn();
+    });
+});
+
+// onchange Text color 
+// (onclick doesn't work on chrome extension... so i must use this shit)
+document.addEventListener('DOMContentLoaded', function () {
+    var link = document.getElementById('textselect');
+    link.addEventListener('change', function () {
+        localStorage.setItem('textcolor', link.value);
+        textcolor(link);
+    });
+});
+
+// onchange Text color 
+// (onclick doesn't work on chrome extension... so i must use this shit)
+document.addEventListener('DOMContentLoaded', function () {
+    var link = document.getElementById('bgselect');
+    link.addEventListener('change', function () {
+        localStorage.setItem('bgcolor', link.value);
+        bgcolor(link);
+    });
+});
+
+
+
+
+/**
+ * Show Help when btn clicked
+ */
+function helpBtn() {
+    $("html, body").animate({
+        scrollTop: $(document).height()
+    }, "slow");
+    create_result_multiline(helptext);
+    create_new_empty_line();
+}
+
+/**
+ * Reset Everything
+ */
+function reset() {
+    localStorage.clear();
+    location.reload();
+}
+
+
+
+
+function showAllNotes() {
+    if (NOTES.length !== 0) {
+        arr_notes = NOTES;
+        res = "";
+        arr_notes.forEach((element, i) => {
+            res += i + 1 + ") " + element + "\n";
+        });
+        create_result_multiline(res);
+    } else {
+        create_result_line("No Notes Found... You can add notes by typing 'notes add { your note }'")
+    }
+}
+/**
+ * create a new note
+ * @param {string} text 
+ */
+async function storeNote() {
+
+    const {
+        value: n
+    } = await swal({
+        title: 'Write your note here',
+        input: 'text',
+        inputPlaceholder: 'Your Note',
+        inputValidator: (value) => {
+            return !value && 'You need to write something!'
         }
-        mynote = n;
-        NOTES.push(mynote);
-        localStorage.setItem("notes", JSON.stringify(NOTES));
+    });
+    if (n) {
+        swal(`Done!`, `Note Added Successfully!`, `success`).then(() => {
+            location.reload();
+        });
+
+    }
+    mynote = n;
+    NOTES.push(mynote);
+    localStorage.setItem("notes", JSON.stringify(NOTES));
 
 
+
+}
+
+/**
+ * init notes
+ */
+function init_notes() {
+    if (localStorage.getItem("notes") != null) {
+        NOTES = JSON.parse(localStorage.getItem("notes"));
+    }
+}
+
+/**
+ * Remove All notes
+ */
+function removeAllNotes() {
+    localStorage.removeItem("notes");
+    NOTES = [];
+}
+
+/**
+ * Remove Note by index
+ * @param {string} index 
+ */
+function removeNoteByIndex(index) {
+    if (!hasNumber(index)) {
+        return;
+    }
+    NOTES.splice(index - 1, 1);
+    localStorage.setItem("notes", JSON.stringify(NOTES));
+}
+
+/**
+ * check if string contains number
+ * @param {string} myString 
+ */
+function hasNumber(myString) {
+    return /\d/.test(myString);
+}
+
+/**
+ * Live Music Streaming
+ * @param {string} type 
+ */
+function music(type) {
+    if (type == "lofi") {
+        create_new_audio_line("http://streaming211.radionomy.com/ArotoInstrumentalRadio");
+    }
+    if (type == "rock") {
+        create_new_audio_line("http://mp3channels.webradio.de/heavy-metal");
+    }
+    if (type == "jazz") {
+        create_new_audio_line("http://streaming208.radionomy.com/Jazz4ever");
+    }
+}
+
+/**
+ * Init Custom commands storage
+ */
+function custom_cmds_init() {
+    if (localStorage.getItem("custom_cmds") != null) {
+        // custom commands exists
+        CUSTOM_CMDS = JSON.parse(localStorage.getItem("custom_cmds"));
+    } else {
+        //alert("custom_cmds not initialized");
+    }
+}
+
+/**
+ * Add a custom command
+ * @param {string} cmd 
+ * @param {string} url 
+ */
+function add_custom_cmd(cmd, url) {
+    let conf = {
+        "cmd": cmd,
+        "url": url
+    }
+    CUSTOM_CMDS.push(conf);
+    localStorage.setItem("custom_cmds", JSON.stringify(CUSTOM_CMDS));
+}
+
+
+/**
+ * Show all commands
+ */
+function show_list_custom_cmd() {
+
+    if (CUSTOM_CMDS.length !== 0) {
+
+        arr_custom_cmd = CUSTOM_CMDS;
+        res = "";
+        arr_custom_cmd.forEach((element, i) => {
+            res += "\n" + (i + 1) + ") " + element.cmd + " ----> " + element.url;
+        });
+        create_result_multiline("Custom Commands : \n------------" + res);
+    } else {
+        create_result_line("No Custom Commands Found... You can add new commands by typing 'cmd add'")
+    }
+
+}
+
+/**
+ * Remove Custom command by index
+ * @param {int} index 
+ */
+
+function removeCMDByIndex(index) {
+    if (!hasNumber(index)) {
+        return;
+    }
+    CUSTOM_CMDS.splice(index - 1, 1);
+    localStorage.setItem("custom_cmds", JSON.stringify(CUSTOM_CMDS));
+}
+
+
+
+
+/**
+ * Add a custom command UI
+ */
+async function custom_cmd_add_ui() {
+
+    const {
+        value: formValues
+    } = await swal({
+
+        html: '<span style="float: left">Type your custom command :</span><input id="cmd-input" name="cmd" placeholder="Your Command  (Example: yahoo)" class="swal2-input">' +
+            '<span style="float: left">Copy/Paste your URL here :</span><input id="url-input" placeholder="Your url (Example: http://yahoo.com)" class="swal2-input">',
+        focusConfirm: true,
+        showCancelButton: true,
+        preConfirm: () => {
+            return [
+                document.getElementById('cmd-input').value,
+                document.getElementById('url-input').value
+            ]
+        }
+    })
+
+    if (formValues) {
+        add_custom_cmd(formValues[0], formValues[1]);
+        swal("Success", "Thank you", "success").then(() => {
+            location.reload();
+        });
+
+    }
+}
+
+
+/*
+ * Test if command is a custom command 
+ */
+function isCustomCmd(cmd) {
+    if (CUSTOM_CMDS.length > 0) {
+        let status = false;
+        CUSTOM_CMDS.forEach(function (element) {
+            if (element.cmd == cmd) {
+                status = true;
+            }
+        });
+        return status;
 
     }
 
-    /**
-     * init notes
-     */
-    function init_notes() {
-        if (localStorage.getItem("notes") != null) {
-            NOTES = JSON.parse(localStorage.getItem("notes"));
-        }
-    }
+}
 
-    /**
-     * Remove All notes
-     */
-    function removeAllNotes() {
-        localStorage.removeItem("notes");
-        NOTES = [];
-    }
 
-    /**
-     * Remove Note by index
-     * @param {string} index 
-     */
-    function removeNoteByIndex(index) {
-        if (!hasNumber(index)) {
-            return;
-        }
-        NOTES.splice(index - 1, 1);
-        localStorage.setItem("notes", JSON.stringify(NOTES));
-    }
+/*
+ * Return URL by custom Command
+ */
+function getURLbyCmd(cmd) {
+    if (CUSTOM_CMDS.length > 0) {
 
-    /**
-     * check if string contains number
-     * @param {string} myString 
-     */
-    function hasNumber(myString) {
-        return /\d/.test(myString);
-    }
+        let url = "";
 
-    function music(type) {
-        if (type == "lofi") {
-            create_new_audio_line("http://streaming211.radionomy.com/ArotoInstrumentalRadio");
-        }
-        if (type == "rock") {
-            create_new_audio_line("http://mp3channels.webradio.de/heavy-metal");
-        }
-        if (type == "jazz") {
-            create_new_audio_line("http://streaming208.radionomy.com/Jazz4ever");
-        }
+        CUSTOM_CMDS.forEach(function (element) {
+            if (element.cmd == cmd) {
+                url = element.url;
+            }
+        });
+
+        return url;
     }
+}
+
+/**
+ * Remove All Custom Commands
+ */
+function removeAllCMD() {
+    localStorage.removeItem("custom_cmds");
+    CUSTOM_CMDS = [];
+}
+
+function getCustomCmdArray(){
+    let res = [];
+    if (CUSTOM_CMDS.length !== 0) {
+
+        arr_custom_cmd = CUSTOM_CMDS;
+        arr_custom_cmd.forEach((element, i) => {
+            res.push(element.cmd);
+        });
+      
+    } 
+    return res;
+
+}
