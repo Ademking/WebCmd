@@ -33,12 +33,17 @@ unpacked extension..." button. Navigate to and select this directory. You
 should then see an "WebCmd" extension and see the app when
 you open a new tab.
 
+### Changelog
+#### [1.1] - 2018-11-21
+- Custom Commands feature. You can add custom commands "cmd add"
+- Fix some bugs (Date problem, typos ...)
+
 ### To Do
 
-* Add Custom Fast Shortcut
-* Add alarm (using LocalStorage)
-* Add chatroom
-* Add news
+[X] Add Custom Fast Shortcut
+[] Add alarm (using LocalStorage)
+[] Add chatroom
+[] Add news
 * Add more tools
 
 
