@@ -40,11 +40,11 @@ you open a new tab.
 
 ### To Do
 
-[X] Add Custom Fast Shortcut
-[] Add alarm (using LocalStorage)
-[] Add chatroom
-[] Add news
-* Add more tools
+- [X] Add Custom Fast Shortcut
+- [ ] Add alarm (using LocalStorage)
+- [ ] Add chatroom
+- [ ] Add news
+- [ ] Add more tools
 
 
 &copy; 2018 Adem Kouki. See [LICENSE](LICENSE) for details.
