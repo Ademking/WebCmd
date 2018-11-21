@@ -1,4 +1,4 @@
-# 💣 WebCmd v1.1
+# 💣 WebCmd
 
 ### Improved "new tab" page made for CLI Lovers
 
